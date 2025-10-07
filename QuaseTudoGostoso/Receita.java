@@ -8,6 +8,7 @@ public class Receita implements Comparable<Receita>{
     Usuario usuario;
 
      ArrayList<Comentario> comentarios = new ArrayList<>();
+     ArrayList<CategoriaReceita> categoriasreceitas = new ArrayList<>();
 
     public Receita(int idreceita, String titulo, String descricao, String imagem, Usuario usuario){
         this.idreceita = idreceita;
@@ -21,5 +22,9 @@ public class Receita implements Comparable<Receita>{
     public int compareTo(Receita other) {
         // Example: Sort by 'nome' in ascending order
         return this.titulo.compareTo(other.titulo);
+    }
+
+    public int getID(){
+        return idreceita;
     }
 }

@@ -11,11 +11,6 @@ public class QTGostoso {
         SortedSet<Receita> receitas = new TreeSet<>();
         SortedSet<CategoriaReceita> categoriareceita = new TreeSet<>();
 
-        Usuario usu = null;
-        Receita rece = null;
-        Comentario come = null;
-        Categoria cate = null;
-
         String op;
         do{
         System.out.println("\n\n ===Quase Tudo Gostoso===");
@@ -37,9 +32,9 @@ public class QTGostoso {
         }while(!op.equals("1") && !op.equals("2") && !op.equals("3") && !op.equals("4") && !op.equals("5") && !op.equals("6") && !op.equals("7") && !op.equals("8") && !op.equals("9") && !op.equals("10") && !op.equals("11"));
         switch (op) {
             case "1":
-           
                     for (Usuario usuario : usuarios) {
                     System.out.println(" \n Informações do Usuário");
+                    System.out.println("ID: "+ usuario.idusuario);
                     System.out.println("Nome: " + usuario.nome);
                     System.out.println("Email: " + usuario.email);
                     System.out.println("Data de Nascimento: " + usuario.data_nascimento);
@@ -49,6 +44,10 @@ public class QTGostoso {
                     System.out.println("Salt: " + usuario.salt);
                     System.out.println("Inscrito: " + usuario.inscrito);
                     System.out.println("uuid: " + usuario.uuid);
+                    Usuario usu = usuarios.stream()
+                        .filter(u -> u.getID() == usuario.idusuario)
+                        .findFirst()
+                        .orElse(null);
                     for (Comentario comentario : usu.comentarios) {
                         System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
                     }
@@ -60,6 +59,8 @@ public class QTGostoso {
                 
                 break;
              case "2":
+                    System.out.print("Digite o id do Usuário: ");
+                    int idusuario = Integer.parseInt(scanner.nextLine());
                     System.out.print("Digite o nome do Usuário: ");
                     String nome = scanner.nextLine();
                     System.out.print("Digite o email: ");
@@ -79,13 +80,12 @@ public class QTGostoso {
                     System.out.print("Digite o uuid: ");
                     String uuid = scanner.nextLine();
 
-                    Usuario b = new Usuario(nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid);
-                    usu =  b;
+                    Usuario b = new Usuario(idusuario, nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid);
                     usuarios.add(b);
                 break;
              case "3":
                 for (Categoria categoria: categorias) {
-                    System.out.println("Informações do Ingrediente");
+                    System.out.println("Informações da categoria");
                     System.out.println("ID: " + categoria.idcategoria);
                     System.out.println("Categoria: " + categoria.categoriaDesc);
                     System.out.println("Ativo: " + categoria.ativo);
@@ -94,12 +94,11 @@ public class QTGostoso {
              case "4":
                     System.out.print("Digite o  ID da Categoria: ");
                     int idcategoria = Integer.parseInt(scanner.nextLine());
-                    System.out.print("Digite o Ingrediente: ");
+                    System.out.print("Digite o nome da Categoria: ");
                     String categoriaDesc = scanner.nextLine();
                     System.out.print("Digite o estado: 1 para ativo, 2 para não ativo ");
                     int ativo = Integer.parseInt(scanner.nextLine());
                     Categoria a = new Categoria(idcategoria, categoriaDesc, ativo);
-                    cate = a;
                     categorias.add(a);
                 break;
              case "5":
@@ -109,6 +108,10 @@ public class QTGostoso {
                     System.out.println("Titulo: " + receita.titulo);
                     System.out.println("Descrição: " + receita.descricao);
                     System.out.println("Imagem: " + receita.imagem);
+                    Receita rece = receitas.stream()
+                        .filter(u -> u.getID() == receita.idreceita)
+                        .findFirst()
+                        .orElse(null);
                     for (Comentario comentario : rece.comentarios) {
                         System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
                     }
@@ -124,8 +127,16 @@ public class QTGostoso {
                     String descricao = scanner.nextLine();
                     System.out.print("Digite o nome da Imagem: ");
                     String imagem = scanner.nextLine();
+                    System.out.println("Insira o id do usuario autor das opções abaixo: ");
+                    for (Usuario usuario : usuarios){
+                        System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
+                    }
+                    int autor = Integer.parseInt(scanner.nextLine());
+                    Usuario usu = usuarios.stream()
+                        .filter(u -> u.getID() == autor)
+                        .findFirst()
+                        .orElse(null);
                     Receita d = new Receita(idreceita, titulo, descricao, imagem, usu);
-                    rece = d;
                     receitas.add(d);
                 break;
              case "7":
@@ -134,6 +145,8 @@ public class QTGostoso {
                     System.out.println("Comentário: " + comentario.comentarioDesc);
                     System.out.println("Nota: " + comentario.nota);
                     System.out.println("Data do Comentário: " + comentario.datacomentario);
+                    System.out.println("Usuario autor: "+comentario.usuario);
+                    System.out.println("Receita alvo: "+comentario.receita);
                     
                 }
                 break;
@@ -146,27 +159,58 @@ public class QTGostoso {
                     int nota = Integer.parseInt(scanner.nextLine());
                     System.out.print("Digite a data do Comentário: ");
                     String datacomentario = scanner.nextLine();
-                    Comentario c = new Comentario(idcomentario, comentarioDesc, nota, datacomentario, usu, rece );
-                    come = c;
+                    System.out.println("Insira o id do usuario autor das opções abaixo: ");
+                    for (Usuario usuario : usuarios){
+                        System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
+                    }
+                    autor = Integer.parseInt(scanner.nextLine());
+                    usu = usuarios.stream()
+                        .filter(u -> u.getID() == autor)
+                        .findFirst()
+                        .orElse(null);
+                    System.out.println("Insira o id da receita alvo do comentario das opções abaixo: ");
+                    for (Receita receita : receitas){
+                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                    }
+                    int autorComen = Integer.parseInt(scanner.nextLine());
+                    Receita rece = receitas.stream()
+                        .filter(u -> u.getID() == autorComen)
+                        .findFirst()
+                        .orElse(null);
+                    Comentario c = new Comentario(idcomentario, comentarioDesc, nota, datacomentario, usu, rece);
                     comentarios.add(c);
                 break;
              case "9":
                 for (CategoriaReceita categoriareceitas: categoriareceita) {
                     System.out.println("Informações do CategoriaReceitas");
-                    System.out.println("Receita_idreceita: " + categoriareceitas.receita_idreceita);
-                    System.out.println("Categoria_idcategoria: " + categoriareceitas.categoria_idcategoria);
-                    
+                    System.out.println("Receita_idreceita: " + categoriareceitas.receita);
+                    System.out.println("Categoria_idcategoria: " + categoriareceitas.categoria);
                 }
                 break;
              case "10":
-                    System.out.print("Digite o idreceita: ");
+                    System.out.println("Insira o id da receita das opções abaixo: ");
+                    for (Receita receita : receitas){
+                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                    }
                     int receita_idreceita = Integer.parseInt(scanner.nextLine());
-                    System.out.print("Digite o icategoria: ");
+                    rece = receitas.stream()
+                        .filter(u -> u.getID() == receita_idreceita)
+                        .findFirst()
+                        .orElse(null);
+                    System.out.println("Insira o id da receita das opções abaixo: ");
+                    for (Receita receita : receitas){
+                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                    }
                     int categoria_idcategoria = Integer.parseInt(scanner.nextLine());
-                    CategoriaReceita e = new CategoriaReceita(receita_idreceita, categoria_idcategoria);
+                    Categoria cate = categorias.stream()
+                        .filter(u -> u.getID() == categoria_idcategoria)
+                        .findFirst()
+                        .orElse(null);
+                    CategoriaReceita e = new CategoriaReceita(rece, cate);
                     categoriareceita.add(e);
                 break;
             }
         }while(!op.equals( "11"));
+        scanner.close();
     }
 }

@@ -1,17 +1,19 @@
 
 public class CategoriaReceita implements Comparable<CategoriaReceita>{
-    int receita_idreceita;
-    int categoria_idcategoria;
+    Receita receita;
+    Categoria categoria;
    
-    public CategoriaReceita(int receita_idreceita, int categoria_idcategoria){
-        this.receita_idreceita = receita_idreceita;
-        this.categoria_idcategoria = categoria_idcategoria;
+    public CategoriaReceita(Receita receita, Categoria categoria){
+        this.receita = receita;
+        this.categoria = categoria;
     }
 
     @Override
     public int compareTo(CategoriaReceita other) {
         // Example: Sort by 'nome' in ascending order
-        return Integer.compare(this.receita_idreceita, other.receita_idreceita);
+        return (this.receita.compareTo(other.receita));
     }
+
+
 
 }

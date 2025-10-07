@@ -1,7 +1,11 @@
+import java.util.ArrayList;
+
 public class Categoria implements Comparable<Categoria>{
     int idcategoria;
     String categoriaDesc;
     int ativo;
+
+    ArrayList<CategoriaReceita> categoriasreceitas = new ArrayList<>();
    
     public Categoria(int idcategoria, String categoriaDesc, int ativo){
         this.idcategoria = idcategoria;
@@ -15,4 +19,7 @@ public class Categoria implements Comparable<Categoria>{
         return this.categoriaDesc.compareTo(other.categoriaDesc);
     }
 
+     public int getID(){
+        return idcategoria;
+    }
 }

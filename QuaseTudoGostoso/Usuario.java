@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Usuario implements Comparable<Usuario> {
-
+        int idusuario;
         String nome;
         String email;
         String data_nascimento;
@@ -15,8 +15,8 @@ public class Usuario implements Comparable<Usuario> {
         ArrayList<Comentario> comentarios = new ArrayList<>();
         ArrayList<Receita> receitas = new ArrayList<>();
 
-    public Usuario(String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ){
-
+    public Usuario(int idusuario, String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ){
+        this.idusuario = idusuario;
         this.nome = nome;
         this.email = email;
         this.data_nascimento = data_nascimento;
@@ -31,7 +31,15 @@ public class Usuario implements Comparable<Usuario> {
     @Override
     public int compareTo(Usuario other) {
         // Example: Sort by 'nome' in ascending order
-        return this.nome.compareTo(other.nome);
+        return Integer.compare(idusuario, other.idusuario);
     }
+
+    public int getID(){
+        return idusuario;
+    }
+
+    /*public ArrayList<Receita> getReceitas(){
+        return receitas;
+    }*/
 
 }
