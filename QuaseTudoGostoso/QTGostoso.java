@@ -1,15 +1,33 @@
 import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
 
 public class QTGostoso {
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
         SortedSet<Usuario> usuarios = new TreeSet<>();
         SortedSet<Categoria> categorias = new TreeSet<>();
         SortedSet<Comentario> comentarios = new TreeSet<>();
         SortedSet<Receita> receitas = new TreeSet<>();
         SortedSet<CategoriaReceita> categoriareceita = new TreeSet<>();
+
+        HttpServer servidor = HttpServer.create(new InetSocketAddress(8888), 0);
+
+        servidor.createContext("/receitas", new Receita());
+        servidor.createContext("/comentarios", new Comentario());
+        servidor.createContext("/categorias", new Categoria());
+        servidor.createContext("/usuarios", new Usuario());
+        servidor.createContext("/categoriasreceitas", new CategoriaReceita());
+
+
+        servidor.setExecutor(null);
+        servidor.start();
+        System.out.println("Servidor rodando em http://localhost:8089/");
+
 
         String op;
         do{
@@ -89,6 +107,13 @@ public class QTGostoso {
                     System.out.println("ID: " + categoria.idcategoria);
                     System.out.println("Categoria: " + categoria.categoriaDesc);
                     System.out.println("Ativo: " + categoria.ativo);
+                    Categoria cate = categorias.stream()
+                        .filter(u -> u.getID() == categoria.idcategoria)
+                        .findFirst()
+                        .orElse(null);
+                    for (CategoriaReceita categoriaReceita : cate.categoriasreceitas){
+                        System.out.println("\n ID CategoriaReceita: " + categoriaReceita.idcategoriareceita + ", Categoria: " + categoriaReceita.categoria);
+                    }
                 }
                 break;
              case "4":
@@ -103,7 +128,7 @@ public class QTGostoso {
                 break;
              case "5":
                 for (Receita receita: receitas) {
-                    System.out.println("Informações do Ingrediente");
+                    System.out.println("Informações da Receita");
                     System.out.println("ID: " + receita.idreceita);
                     System.out.println("Titulo: " + receita.titulo);
                     System.out.println("Descrição: " + receita.descricao);
@@ -114,6 +139,9 @@ public class QTGostoso {
                         .orElse(null);
                     for (Comentario comentario : rece.comentarios) {
                         System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
+                    }
+                    for (CategoriaReceita categoriaReceita : rece.categoriasreceitas){
+                        System.out.println("\n ID CategoriaReceita: " + categoriaReceita.idcategoriareceita + ", Categoria: " + categoriaReceita.categoria);
                     }
                     
                 }
@@ -183,11 +211,14 @@ public class QTGostoso {
              case "9":
                 for (CategoriaReceita categoriareceitas: categoriareceita) {
                     System.out.println("Informações do CategoriaReceitas");
+                    System.out.println("idcategoriareceita: " + categoriareceitas.idcategoriareceita);
                     System.out.println("Receita_idreceita: " + categoriareceitas.receita);
                     System.out.println("Categoria_idcategoria: " + categoriareceitas.categoria);
                 }
                 break;
              case "10":
+                    System.out.println("Insira o id da categoria receita: ");
+                    int idcategoriareceita = Integer.parseInt(scanner.nextLine());
                     System.out.println("Insira o id da receita das opções abaixo: ");
                     for (Receita receita : receitas){
                         System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
@@ -197,7 +228,7 @@ public class QTGostoso {
                         .filter(u -> u.getID() == receita_idreceita)
                         .findFirst()
                         .orElse(null);
-                    System.out.println("Insira o id da receita das opções abaixo: ");
+                    System.out.println("Insira o id da categoria das opções abaixo: ");
                     for (Receita receita : receitas){
                         System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
                     }
@@ -206,7 +237,7 @@ public class QTGostoso {
                         .filter(u -> u.getID() == categoria_idcategoria)
                         .findFirst()
                         .orElse(null);
-                    CategoriaReceita e = new CategoriaReceita(rece, cate);
+                    CategoriaReceita e = new CategoriaReceita(idcategoriareceita, rece, cate);
                     categoriareceita.add(e);
                 break;
             }
