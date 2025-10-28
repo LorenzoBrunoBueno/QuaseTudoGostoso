@@ -86,45 +86,45 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         return uuid;
     }
 
-    public int setID(int idusuario){
-        return idusuario;
+    public void setID(int idusuario){
+        this.idusuario = idusuario;
     }
 
 
-    public String setNome(String nome){
-        return nome;
+    public void setNome(String nome){
+        this.nome = nome;
     }
 
-    public String getEmail(String email){
-        return email;
+    public void setEmail(String email){
+        this.email = email;
     }
 
-    public String data_nascimento(String data_nascimento){
-        return data_nascimento;
+    public void setData_nascimento(String data_nascimento){
+        this.data_nascimento = data_nascimento;
     }
 
-    public int setCep(int cep){
-        return cep;
+    public void setCep(int cep){
+        this.cep = cep;
     }
 
-    public int setGenero(int genero){
-        return genero;
+    public void setGenero(int genero){
+        this.genero = genero;
     }
 
-    public String getSenha(String senha){
-        return senha;
+    public void getSenha(String senha){
+        this.senha = senha;
     }
     
-    public String getSalt(String salt){
-        return salt;
+    public void getSalt(String salt){
+        this.salt = salt;
     }
 
-    public String getInscrito(String inscrito){
-        return inscrito;
+    public void getInscrito(String inscrito){
+        this.inscrito = inscrito;
     }
     
-    public String getUuid(String uuid){
-        return uuid;
+    public void getUuid(String uuid){
+        this.uuid = uuid;
     }
 
      @Override
@@ -145,15 +145,14 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         }
     }
 
-    int idusuario, String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid 
 
     public void handleGet(HttpExchange exchange) throws IOException{
          StringBuilder json = new StringBuilder("[");
-        for (int i = 0; i < comentarios.size(); i++) {
-            Comentario x = comentarios.get(i);
+        for (int i = 0; i < usuarios.size(); i++) {
+            Usuario x = usuarios.get(i);
             json.append(String.format("{\"ID\": \"%s\", \"Comentario\": \"%s\", \"Nota\": \"%s\", \"Data\":\"%s\", \"ID usuario\":\"%s\", \"ID Receita\":\"%s\"}",
-                    x.getID(), x.getNome(), x.getEmail(), x.getData_nascimento(), x.getUsuario(), x.getReceita()));
-            if (i < comentarios.size() - 1) json.append(",");
+                    x.getID(), x.getNome(), x.getEmail(), x.getData_nascimento(), x.getCep(), x.getGenero(), x.getSenha(), x.getSalt(), x.getInscrito(), x.getUuid()));
+            if (i < usuarios.size() - 1) json.append(",");
         }
         json.append("]");
 

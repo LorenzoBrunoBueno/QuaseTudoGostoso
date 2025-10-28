@@ -70,7 +70,7 @@ public class QTGostoso {
                         System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
                     }
                     for (Receita receita : usu.receitas) {
-                        System.out.println("\n Receita ID: " + receita.idreceita + ", Titulo: " + receita.titulo);
+                        System.out.println("\n Receita ID: " + receita.getID() + ", Titulo: " + receita.getTitulo());
                     }
                 }
 
@@ -104,11 +104,11 @@ public class QTGostoso {
              case "3":
                 for (Categoria categoria: categorias) {
                     System.out.println("Informações da categoria");
-                    System.out.println("ID: " + categoria.idcategoria);
-                    System.out.println("Categoria: " + categoria.categoriaDesc);
-                    System.out.println("Ativo: " + categoria.ativo);
+                    System.out.println("ID: " + categoria.getID());
+                    System.out.println("Categoria: " + categoria.getCategoriaDesc());
+                    System.out.println("Ativo: " + categoria.getAtivo());
                     Categoria cate = categorias.stream()
-                        .filter(u -> u.getID() == categoria.idcategoria)
+                        .filter(u -> u.getID() == categoria.getID())
                         .findFirst()
                         .orElse(null);
                     for (CategoriaReceita categoriaReceita : cate.categoriasreceitas){
@@ -129,12 +129,12 @@ public class QTGostoso {
              case "5":
                 for (Receita receita: receitas) {
                     System.out.println("Informações da Receita");
-                    System.out.println("ID: " + receita.idreceita);
-                    System.out.println("Titulo: " + receita.titulo);
-                    System.out.println("Descrição: " + receita.descricao);
-                    System.out.println("Imagem: " + receita.imagem);
+                    System.out.println("ID: " + receita.getID());
+                    System.out.println("Titulo: " + receita.getTitulo());
+                    System.out.println("Descrição: " + receita.getDescricao());
+                    System.out.println("Imagem: " + receita.getImagem());
                     Receita rece = receitas.stream()
-                        .filter(u -> u.getID() == receita.idreceita)
+                        .filter(u -> u.getID() == receita.getID())
                         .findFirst()
                         .orElse(null);
                     for (Comentario comentario : rece.comentarios) {
@@ -198,7 +198,7 @@ public class QTGostoso {
                         .orElse(null);
                     System.out.println("Insira o id da receita alvo do comentario das opções abaixo: ");
                     for (Receita receita : receitas){
-                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                        System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int autorComen = Integer.parseInt(scanner.nextLine());
                     Receita rece = receitas.stream()
@@ -221,7 +221,7 @@ public class QTGostoso {
                     int idcategoriareceita = Integer.parseInt(scanner.nextLine());
                     System.out.println("Insira o id da receita das opções abaixo: ");
                     for (Receita receita : receitas){
-                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                        System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int receita_idreceita = Integer.parseInt(scanner.nextLine());
                     rece = receitas.stream()
@@ -230,7 +230,7 @@ public class QTGostoso {
                         .orElse(null);
                     System.out.println("Insira o id da categoria das opções abaixo: ");
                     for (Receita receita : receitas){
-                        System.out.println("ID: "+receita.idreceita+", Titulo da Receita: "+receita.titulo);
+                        System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int categoria_idcategoria = Integer.parseInt(scanner.nextLine());
                     Categoria cate = categorias.stream()
