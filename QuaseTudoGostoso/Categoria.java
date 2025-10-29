@@ -21,6 +21,23 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
         this.ativo = ativo;
     }
 
+    public static void addCategoria(Categoria categoria){
+        Categoria.categorias.add(categoria);
+    }
+
+    @Override
+    public String toString() {
+        return
+         "" +
+        "Id:" + this.getID() + "\n" +
+        "Descrição:" + this.getCategoriaDesc() + "\n" +
+        "Ativo:" + this.getAtivo();
+    }
+
+     public static ArrayList<Categoria> getCategorias() {
+        return categorias;
+    }
+
     public Categoria(){
         
     }

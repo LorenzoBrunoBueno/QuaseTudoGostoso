@@ -23,7 +23,6 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         this.descricao = descricao;
         this.imagem = imagem;
         this.usuario = usuario;
-        receitas.add(this);
         usuario.receitas.add(this);
     }
 
@@ -71,6 +70,20 @@ public class Receita implements HttpHandler, Comparable<Receita>{
 
     public void setUsuario(Usuario usuario){
         this.usuario = usuario;
+    }
+
+      public static void addReceita(Receita receita){
+        Receita.receitas.add(receita);
+    }
+
+    @Override
+    public String toString() {
+        return
+         "" +
+        "Id:" + this.getID() + "\n" +
+        "Titulo:" + this.getTitulo() + "\n" +
+        "Descrição:" + this.getDescricao() + "\n" +
+        "Imagem:" + this.getImagem();
     }
 
     public static ArrayList<Receita> getReceitas() {

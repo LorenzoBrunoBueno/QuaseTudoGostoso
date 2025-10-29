@@ -80,6 +80,27 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         this.receita = receita;
     }
 
+     public static void addComentario(Comentario comentario){
+        Comentario.comentarios.add(comentario);
+    }
+
+    @Override
+    public String toString() {
+        return
+         "" +
+        "Id:" + this.getID() + "\n" +
+        "Nome:" + this.getComentarioDesc() + "\n" +
+        "Email:" + this.getNota() + "\n" +
+        "Data Nascimento:" + this.getDatacomentario() + "\n" +
+        "Usuario:" + this.getUsuario() + "\n" +
+        "Receita:" + this.getReceita();
+    }
+
+    
+    public static ArrayList<Comentario> getComentarios() {
+        return comentarios;
+    }
+
      public Comentario(){
         
     }

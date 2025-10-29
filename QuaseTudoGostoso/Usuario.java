@@ -33,6 +33,33 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         this.salt = salt;
         this.inscrito = inscrito;
         this.uuid = uuid;
+
+
+    }
+
+    public static void addUsuario(Usuario usuario){
+        Usuario.usuarios.add(usuario);
+    }
+
+    @Override
+    public String toString() {
+        return
+         "" +
+        "Id:" + this.getID() + "\n" +
+        "Nome:" + this.getNome() + "\n" +
+        "Email:" + this.getEmail() + "\n" +
+        "Data Nascimento:" + this.getData_nascimento() + "\n" +
+        "CEP:" + this.getCep() + "\n" +
+        "Gênero:" + this.getGenero() + "\n" +
+        "Senha:" + this.getSenha() + "\n" +
+        "Salt:" + this.getSalt() + "\n" +
+        "Data Inscrição:" + this.getInscrito() + "\n" +
+        "UUID:" + this.getUuid();
+    }
+
+    
+    public static ArrayList<Usuario> getUsuarios() {
+        return usuarios;
     }
 
     public Usuario(){
@@ -111,19 +138,19 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         this.genero = genero;
     }
 
-    public void getSenha(String senha){
+    public void setSenha(String senha){
         this.senha = senha;
     }
     
-    public void getSalt(String salt){
+    public void setSalt(String salt){
         this.salt = salt;
     }
 
-    public void getInscrito(String inscrito){
+    public void setInscrito(String inscrito){
         this.inscrito = inscrito;
     }
     
-    public void getUuid(String uuid){
+    public void setUuid(String uuid){
         this.uuid = uuid;
     }
 
@@ -150,7 +177,7 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
          StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < usuarios.size(); i++) {
             Usuario x = usuarios.get(i);
-            json.append(String.format("{\"ID\": \"%s\", \"Comentario\": \"%s\", \"Nota\": \"%s\", \"Data\":\"%s\", \"ID usuario\":\"%s\", \"ID Receita\":\"%s\"}",
+            json.append(String.format("{\"ID\": \"%s\", \"Nome Usuario\": \"%s\", \"Email\": \"%s\", \"Data de Nascimento\":\"%s\", \"CEP\":\"%s\", \"Genero\":\"%s\", \"Senha\":\"%s\", \"Salt\":\"Inscrito\":\"uuid\":\"%s\"}",
                     x.getID(), x.getNome(), x.getEmail(), x.getData_nascimento(), x.getCep(), x.getGenero(), x.getSenha(), x.getSalt(), x.getInscrito(), x.getUuid()));
             if (i < usuarios.size() - 1) json.append(",");
         }
@@ -168,43 +195,31 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         InputStream is = exchange.getRequestBody();
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
-        String idcomentario = body.replaceAll(".*\"Comentario ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        String comentarioDescri = body.replaceAll(".*\"Descricao\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        String Nota = body.replaceAll(".*\"Nota\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        String data = body.replaceAll(".*\"DataComentario\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String idusuario = body.replaceAll(".*\"Usuario ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        String idreceita = body.replaceAll(".*\"Receita ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        int comen = Integer.parseInt(idcomentario);
-        int recei = Integer.parseInt(idreceita);
-        int usua = Integer.parseInt(idusuario);
-        int nota = Integer.parseInt(Nota);
+        String nome = body.replaceAll(".*\"Nome\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String email = body.replaceAll(".*\"Email\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String data_nasci = body.replaceAll(".*\"Data Nascimento\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String cep = body.replaceAll(".*\"CEP\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String genero = body.replaceAll(".*\"Genero\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String Senha = body.replaceAll(".*\"Senha\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String salt = body.replaceAll(".*\"Salt\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String inscrito = body.replaceAll(".*\"Inscrito\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String uuid = body.replaceAll(".*\"UUID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        int idusu = Integer.parseInt(idusuario);
+        int intcep = Integer.parseInt(cep);
+        int intgenero = Integer.parseInt(genero);
 
-        Usuario usuarioobj = null;
-        for(Usuario usu :  Usuario.usuarios){
-            if (usu.getID() == (usua)){
-                usuarioobj = usu;
-                break;
-            }
-        }
+          
+        new Usuario(idusu, nome, email, data_nasci, intcep, intgenero, Senha, salt, inscrito, uuid);
 
-        Receita receitaobj = null;
-        for(Receita rece :  Receita.receitas){
-            if (rece.getID() == (recei)){
-                receitaobj = rece;
-                break;
-            }
-        }
-        
-        
-        new Comentario(comen, comentarioDescri, nota, data, usuarioobj, receitaobj);
-
-        String response = "{\"message\": \"Categoria adicionada com sucesso\"}";
+        String response = "{\"message\": \"Usuario adicionada com sucesso\"}";
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
 
         exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
         exchange.sendResponseHeaders(201, bytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
+            os.close();
         }
     }
 

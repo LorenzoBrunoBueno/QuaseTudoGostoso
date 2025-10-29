@@ -57,6 +57,24 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         this.receita = receita;
     }
 
+     public static void addCategoriaReceita(CategoriaReceita categoriaReceita){
+        CategoriaReceita.categoriasreceitas.add(categoriaReceita);
+    }
+
+    @Override
+    public String toString() {
+        return
+         "" +
+        "Id:" + this.getID() + "\n" +
+        "Receita:" + this.getReceita() + "\n" +
+        "Categoria:" + this.getCategoria();
+    }
+
+    
+    public static ArrayList<CategoriaReceita> getCategoriaReceitas() {
+        return categoriasreceitas;
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();

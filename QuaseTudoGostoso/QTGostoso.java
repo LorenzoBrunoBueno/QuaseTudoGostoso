@@ -1,6 +1,4 @@
 import java.util.Scanner;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,24 +7,28 @@ import java.net.InetSocketAddress;
 public class QTGostoso {
     public static void main(String[] args) throws IOException{
         Scanner scanner = new Scanner(System.in);
-        SortedSet<Usuario> usuarios = new TreeSet<>();
+        /*SortedSet<Usuario> usuarios = new TreeSet<>();
         SortedSet<Categoria> categorias = new TreeSet<>();
         SortedSet<Comentario> comentarios = new TreeSet<>();
         SortedSet<Receita> receitas = new TreeSet<>();
-        SortedSet<CategoriaReceita> categoriareceita = new TreeSet<>();
+        SortedSet<CategoriaReceita> categoriareceita = new TreeSet<>();*/
+        /*Usuario usuarios = new Usuario();
+        /*Categoria categorias = new Categoria();
+        Comentario comentarios = new Comentario();
+        Receita receitas = new Receita();
+        CategoriaReceita categoriareceitas = new CategoriaReceita();*/
+        HttpServer server = HttpServer.create(new InetSocketAddress(8888), 0);
 
-        HttpServer servidor = HttpServer.create(new InetSocketAddress(8888), 0);
-
-        servidor.createContext("/receitas", new Receita());
-        servidor.createContext("/comentarios", new Comentario());
-        servidor.createContext("/categorias", new Categoria());
-        servidor.createContext("/usuarios", new Usuario());
-        servidor.createContext("/categoriasreceitas", new CategoriaReceita());
+        server.createContext("/receitas", new Receita());
+        server.createContext("/comentarios", new Comentario());
+        server.createContext("/categorias", new Categoria());
+        server.createContext("/usuarios", new Usuario());
+        server.createContext("/categoriasreceitas", new CategoriaReceita());
 
 
-        servidor.setExecutor(null);
-        servidor.start();
-        System.out.println("Servidor rodando em http://localhost:8089/");
+        server.setExecutor(null);
+        server.start();
+        System.out.println("Servidor rodando em http://localhost:8888/");
 
 
         String op;
@@ -50,19 +52,10 @@ public class QTGostoso {
         }while(!op.equals("1") && !op.equals("2") && !op.equals("3") && !op.equals("4") && !op.equals("5") && !op.equals("6") && !op.equals("7") && !op.equals("8") && !op.equals("9") && !op.equals("10") && !op.equals("11"));
         switch (op) {
             case "1":
-                    for (Usuario usuario : usuarios) {
+                    for (Usuario usuario : Usuario.getUsuarios()) {
                     System.out.println(" \n Informações do Usuário");
-                    System.out.println("ID: "+ usuario.idusuario);
-                    System.out.println("Nome: " + usuario.nome);
-                    System.out.println("Email: " + usuario.email);
-                    System.out.println("Data de Nascimento: " + usuario.data_nascimento);
-                    System.out.println("CEP: " + usuario.cep);
-                    System.out.println("Gênero: " + (usuario.genero == 1 ? "Homem" : "Mulher"));
-                    System.out.println("Senha: " + usuario.senha);
-                    System.out.println("Salt: " + usuario.salt);
-                    System.out.println("Inscrito: " + usuario.inscrito);
-                    System.out.println("uuid: " + usuario.uuid);
-                    Usuario usu = usuarios.stream()
+                    System.out.println(usuario);
+                    Usuario usu = Usuario.usuarios.stream()
                         .filter(u -> u.getID() == usuario.idusuario)
                         .findFirst()
                         .orElse(null);
@@ -98,16 +91,16 @@ public class QTGostoso {
                     System.out.print("Digite o uuid: ");
                     String uuid = scanner.nextLine();
 
+                    
                     Usuario b = new Usuario(idusuario, nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid);
-                    usuarios.add(b);
+                    Usuario.addUsuario(b);
+                    //usuarios.add(b);
                 break;
              case "3":
-                for (Categoria categoria: categorias) {
+                for (Categoria categoria: Categoria.getCategorias()) {
                     System.out.println("Informações da categoria");
-                    System.out.println("ID: " + categoria.getID());
-                    System.out.println("Categoria: " + categoria.getCategoriaDesc());
-                    System.out.println("Ativo: " + categoria.getAtivo());
-                    Categoria cate = categorias.stream()
+                    System.out.println(categoria);
+                    Categoria cate = Categoria.categorias.stream()
                         .filter(u -> u.getID() == categoria.getID())
                         .findFirst()
                         .orElse(null);
@@ -124,16 +117,13 @@ public class QTGostoso {
                     System.out.print("Digite o estado: 1 para ativo, 2 para não ativo ");
                     int ativo = Integer.parseInt(scanner.nextLine());
                     Categoria a = new Categoria(idcategoria, categoriaDesc, ativo);
-                    categorias.add(a);
+                    Categoria.addCategoria(a);
                 break;
              case "5":
-                for (Receita receita: receitas) {
+                for (Receita receita: Receita.getReceitas()) {
                     System.out.println("Informações da Receita");
-                    System.out.println("ID: " + receita.getID());
-                    System.out.println("Titulo: " + receita.getTitulo());
-                    System.out.println("Descrição: " + receita.getDescricao());
-                    System.out.println("Imagem: " + receita.getImagem());
-                    Receita rece = receitas.stream()
+                    System.out.println(receita);
+                    Receita rece = Receita.receitas.stream()
                         .filter(u -> u.getID() == receita.getID())
                         .findFirst()
                         .orElse(null);
@@ -156,26 +146,21 @@ public class QTGostoso {
                     System.out.print("Digite o nome da Imagem: ");
                     String imagem = scanner.nextLine();
                     System.out.println("Insira o id do usuario autor das opções abaixo: ");
-                    for (Usuario usuario : usuarios){
+                    for (Usuario usuario : Usuario.usuarios){
                         System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
                     }
                     int autor = Integer.parseInt(scanner.nextLine());
-                    Usuario usu = usuarios.stream()
+                    Usuario usu = Usuario.usuarios.stream()
                         .filter(u -> u.getID() == autor)
                         .findFirst()
                         .orElse(null);
                     Receita d = new Receita(idreceita, titulo, descricao, imagem, usu);
-                    receitas.add(d);
+                    Receita.addReceita(d);
                 break;
              case "7":
-                for (Comentario comentario: comentarios) {
+                for (Comentario comentario: Comentario.getComentarios()) {
                     System.out.println("Informações do Comentário");
-                    System.out.println("Comentário: " + comentario.comentarioDesc);
-                    System.out.println("Nota: " + comentario.nota);
-                    System.out.println("Data do Comentário: " + comentario.datacomentario);
-                    System.out.println("Usuario autor: "+comentario.usuario);
-                    System.out.println("Receita alvo: "+comentario.receita);
-                    
+                    System.out.println(comentario);
                 }
                 break;
              case "8":
@@ -188,57 +173,55 @@ public class QTGostoso {
                     System.out.print("Digite a data do Comentário: ");
                     String datacomentario = scanner.nextLine();
                     System.out.println("Insira o id do usuario autor das opções abaixo: ");
-                    for (Usuario usuario : usuarios){
+                    for (Usuario usuario : Usuario.usuarios){
                         System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
                     }
                     autor = Integer.parseInt(scanner.nextLine());
-                    usu = usuarios.stream()
+                    usu = Usuario.usuarios.stream()
                         .filter(u -> u.getID() == autor)
                         .findFirst()
                         .orElse(null);
                     System.out.println("Insira o id da receita alvo do comentario das opções abaixo: ");
-                    for (Receita receita : receitas){
+                    for (Receita receita : Receita.receitas){
                         System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int autorComen = Integer.parseInt(scanner.nextLine());
-                    Receita rece = receitas.stream()
+                    Receita rece = Receita.receitas.stream()
                         .filter(u -> u.getID() == autorComen)
                         .findFirst()
                         .orElse(null);
                     Comentario c = new Comentario(idcomentario, comentarioDesc, nota, datacomentario, usu, rece);
-                    comentarios.add(c);
+                    Comentario.addComentario(c);
                 break;
              case "9":
-                for (CategoriaReceita categoriareceitas: categoriareceita) {
+                for (CategoriaReceita categoriareceitas: CategoriaReceita.getCategoriaReceitas()) {
                     System.out.println("Informações do CategoriaReceitas");
-                    System.out.println("idcategoriareceita: " + categoriareceitas.idcategoriareceita);
-                    System.out.println("Receita_idreceita: " + categoriareceitas.receita);
-                    System.out.println("Categoria_idcategoria: " + categoriareceitas.categoria);
+                    System.out.println(categoriareceitas);
                 }
                 break;
              case "10":
                     System.out.println("Insira o id da categoria receita: ");
                     int idcategoriareceita = Integer.parseInt(scanner.nextLine());
                     System.out.println("Insira o id da receita das opções abaixo: ");
-                    for (Receita receita : receitas){
+                    for (Receita receita : Receita.receitas){
                         System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int receita_idreceita = Integer.parseInt(scanner.nextLine());
-                    rece = receitas.stream()
+                    rece = Receita.receitas.stream()
                         .filter(u -> u.getID() == receita_idreceita)
                         .findFirst()
                         .orElse(null);
                     System.out.println("Insira o id da categoria das opções abaixo: ");
-                    for (Receita receita : receitas){
+                    for (Receita receita : Receita.receitas){
                         System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int categoria_idcategoria = Integer.parseInt(scanner.nextLine());
-                    Categoria cate = categorias.stream()
+                    Categoria cate = Categoria.categorias.stream()
                         .filter(u -> u.getID() == categoria_idcategoria)
                         .findFirst()
                         .orElse(null);
                     CategoriaReceita e = new CategoriaReceita(idcategoriareceita, rece, cate);
-                    categoriareceita.add(e);
+                    CategoriaReceita.addCategoriaReceita(e);
                 break;
             }
         }while(!op.equals( "11"));
