@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
 
 public class Comentario implements HttpHandler, Comparable<Comentario>{
     int idcomentario;
@@ -16,15 +17,48 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
 
     public static ArrayList<Comentario> comentarios = new ArrayList<>();
 
-    public Comentario(int idcomentario, String comentarioDesc, int nota, String datacomentario, Usuario usuario, Receita receita){
+    public Comentario(String comentarioDesc, int nota, String datacomentario, Usuario usuario, Receita receita) throws Exception{
+        this.comentarioDesc = comentarioDesc;
+        this.nota = nota;
+        this.datacomentario = datacomentario;
+        this.usuario = usuario;
+        this.receita = receita;
+
+       
+
+
+        receita.comentarios.add(this);
+        usuario.comentarios.add(this);
+    }
+
+    public Comentario(int idcomentario, String comentarioDesc, int nota, String datacomentario, Usuario usuario, Receita receita) throws Exception{
         this.idcomentario = idcomentario;
         this.comentarioDesc = comentarioDesc;
         this.nota = nota;
         this.datacomentario = datacomentario;
         this.usuario = usuario;
         this.receita = receita;
+
+       
+
+
         receita.comentarios.add(this);
         usuario.comentarios.add(this);
+    }
+
+
+    public void inserir()throws Exception{
+         PreparedStatement stmt = DAO.createConnection().prepareStatement (
+            "INSERT INTO comentario (comentario, nota, datacomentario, cadastro_idusuario, receita_idreceita) VALUES (?, ?, ?, ?);"
+        );
+        stmt.setString(1, this.getComentarioDesc());
+        stmt.setInt(2, this.getNota());
+        stmt.setString(3, this.getDatacomentario());
+        stmt.setInt(4, this.usuario.getID());
+        stmt.setInt(5, this.receita.getID());
+
+        stmt.execute();
+        DAO.closeConnection();
     }
 
 
@@ -107,16 +141,29 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
-        if (method.equalsIgnoreCase("GET")) {
-            handleGet(exchange);
-        } else if (method.equalsIgnoreCase("POST")) {
-            handlePost(exchange);
-        } else {
-            String response = "Método não suportado, Utilize apenas GET e POST!";
+
+        try{
+            String method = exchange.getRequestMethod();
+            if (method.equalsIgnoreCase("GET")) {
+                handleGet(exchange);
+            } else if (method.equalsIgnoreCase("POST")) {
+                handlePost(exchange);
+            } else {
+                String response = "Método não suportado, Utilize apenas GET e POST!";
+                byte[] bytes = response.getBytes("UTF-8");
+                exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
+                exchange.sendResponseHeaders(405, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            String response = "Erro interno no servidor.";
             byte[] bytes = response.getBytes("UTF-8");
             exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
-            exchange.sendResponseHeaders(405, bytes.length);
+            exchange.sendResponseHeaders(500, bytes.length);
+
             OutputStream os = exchange.getResponseBody();
             os.write(bytes);
             os.close();
@@ -141,17 +188,15 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         }
     }
 
-     private void handlePost(HttpExchange exchange) throws IOException {
+     private void handlePost(HttpExchange exchange) throws IOException, Exception {
         InputStream is = exchange.getRequestBody();
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
-        String idcomentario = body.replaceAll(".*\"Comentario ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String comentarioDescri = body.replaceAll(".*\"Descricao\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String Nota = body.replaceAll(".*\"Nota\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String data = body.replaceAll(".*\"DataComentario\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String idusuario = body.replaceAll(".*\"Usuario ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String idreceita = body.replaceAll(".*\"Receita ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        int comen = Integer.parseInt(idcomentario);
         int recei = Integer.parseInt(idreceita);
         int usua = Integer.parseInt(idusuario);
         int nota = Integer.parseInt(Nota);
@@ -173,7 +218,7 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         }
         
         
-        new Comentario(comen, comentarioDescri, nota, data, usuarioobj, receitaobj);
+        new Comentario(comentarioDescri, nota, data, usuarioobj, receitaobj);
 
         String response = "{\"message\": \"Categoria adicionada com sucesso\"}";
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);

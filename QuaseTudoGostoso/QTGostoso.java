@@ -2,6 +2,8 @@ import java.util.Scanner;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.sql.Connection;
+import java.sql.ResultSet;
 
 
 public class QTGostoso {
@@ -24,6 +26,7 @@ public class QTGostoso {
         server.createContext("/categorias", new Categoria());
         server.createContext("/usuarios", new Usuario());
         server.createContext("/categoriasreceitas", new CategoriaReceita());
+        Connection conexao = DAO.createConnection();
 
 
         server.setExecutor(null);
@@ -52,31 +55,42 @@ public class QTGostoso {
         }while(!op.equals("1") && !op.equals("2") && !op.equals("3") && !op.equals("4") && !op.equals("5") && !op.equals("6") && !op.equals("7") && !op.equals("8") && !op.equals("9") && !op.equals("10") && !op.equals("11"));
         switch (op) {
             case "1":
-                    for (Usuario usuario : Usuario.getUsuarios()) {
-                    System.out.println(" \n Informações do Usuário");
-                    System.out.println(usuario);
-                    Usuario usu = Usuario.usuarios.stream()
-                        .filter(u -> u.getID() == usuario.idusuario)
-                        .findFirst()
-                        .orElse(null);
-                    for (Comentario comentario : usu.comentarios) {
-                        System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
-                    }
-                    for (Receita receita : usu.receitas) {
-                        System.out.println("\n Receita ID: " + receita.getID() + ", Titulo: " + receita.getTitulo());
-                    }
-                }
+                try{
+                     ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT * FROM usuario;"
+                );
+                while(rs.next()){
+                    Usuario usuario2 = new Usuario(
+                        rs.getInt("idusuario"), 
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("data_nascimento"),
+                        rs.getInt("cep"), 
+                        rs.getInt("genero"),
+                        rs.getString("senha"),
+                        rs.getString("salt"),
+                        rs.getString("inscrito"),
+                        rs.getString("uuid")
 
+                    );
+                    System.out.println(usuario2);
+                    System.out.println("===================================");
+                }
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao carregar usuários");
+
+                }
+               
                 
                 break;
              case "2":
-                    System.out.print("Digite o id do Usuário: ");
-                    int idusuario = Integer.parseInt(scanner.nextLine());
+                try{
                     System.out.print("Digite o nome do Usuário: ");
                     String nome = scanner.nextLine();
                     System.out.print("Digite o email: ");
                     String email = scanner.nextLine();
-                    System.out.print("Digite a data de Nascimento (dd/mm/aaaa): ");
+                    System.out.print("Digite a data de Nascimento (AAAA-MM-DD): ");
                     String data_nascimento = scanner.nextLine();
                     System.out.print("Digite o CEP: ");
                     int cep = Integer.parseInt(scanner.nextLine());
@@ -86,128 +100,437 @@ public class QTGostoso {
                     String senha = scanner.nextLine();
                     System.out.print("Digite o Salt: ");
                     String salt = scanner.nextLine();
-                    System.out.print("Digite o Inscrito: ");
+                    System.out.print("Digite a data de Inscricao (2025-11-24 15:30:00): ");
                     String inscrito = scanner.nextLine();
                     System.out.print("Digite o uuid: ");
                     String uuid = scanner.nextLine();
-
                     
-                    Usuario b = new Usuario(idusuario, nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid);
+                    Usuario b = new Usuario(nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid);
+                    b.inserir();
                     Usuario.addUsuario(b);
                     //usuarios.add(b);
+                } catch (Exception e){
+                    System.out.print("Erro ao criar usuário!");   
+                    e.printStackTrace();
+                }  
+                   
                 break;
              case "3":
-                for (Categoria categoria: Categoria.getCategorias()) {
-                    System.out.println("Informações da categoria");
-                    System.out.println(categoria);
-                    Categoria cate = Categoria.categorias.stream()
-                        .filter(u -> u.getID() == categoria.getID())
-                        .findFirst()
-                        .orElse(null);
-                    for (CategoriaReceita categoriaReceita : cate.categoriasreceitas){
-                        System.out.println("\n ID CategoriaReceita: " + categoriaReceita.idcategoriareceita + ", Categoria: " + categoriaReceita.categoria);
-                    }
+                try{
+                     ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT * FROM categoria;"
+                );
+                while(rs.next()){
+                    Categoria categoria2 = new Categoria(
+                        rs.getInt("idcategoria"), 
+                        rs.getString("categoria"),
+                        rs.getInt("ativo")
+                    );
+                    System.out.println(categoria2);
+                    System.out.println("===================================");
+                }
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao carregar categorias");
+
                 }
                 break;
              case "4":
-                    System.out.print("Digite o  ID da Categoria: ");
-                    int idcategoria = Integer.parseInt(scanner.nextLine());
+                try{
                     System.out.print("Digite o nome da Categoria: ");
                     String categoriaDesc = scanner.nextLine();
                     System.out.print("Digite o estado: 1 para ativo, 2 para não ativo ");
                     int ativo = Integer.parseInt(scanner.nextLine());
-                    Categoria a = new Categoria(idcategoria, categoriaDesc, ativo);
+                    Categoria a = new Categoria(categoriaDesc, ativo);
+                    a.inserir();
                     Categoria.addCategoria(a);
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.print("Erro ao criar categoria");
+                }
+                    
                 break;
              case "5":
-                for (Receita receita: Receita.getReceitas()) {
-                    System.out.println("Informações da Receita");
-                    System.out.println(receita);
-                    Receita rece = Receita.receitas.stream()
-                        .filter(u -> u.getID() == receita.getID())
-                        .findFirst()
-                        .orElse(null);
-                    for (Comentario comentario : rece.comentarios) {
-                        System.out.println("\n Comentario ID: " + comentario.idcomentario + ", Comentario: " + comentario.comentarioDesc);
-                    }
-                    for (CategoriaReceita categoriaReceita : rece.categoriasreceitas){
-                        System.out.println("\n ID CategoriaReceita: " + categoriaReceita.idcategoriareceita + ", Categoria: " + categoriaReceita.categoria);
-                    }
-                    
+                try{
+                     ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT r.idreceita, r.descricao, r.titulo, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.cadastro_idusuario = u.idusuario"
+                );
+                while(rs.next()){
+
+                    Usuario receUsuario = new Usuario(
+                        rs.getInt("idusuario"), 
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("data_nascimento"),
+                        rs.getInt("cep"), 
+                        rs.getInt("genero"),
+                        rs.getString("senha"),
+                        rs.getString("salt"),
+                        rs.getString("inscrito"),
+                        rs.getString("uuid")
+
+                    );
+
+                    Receita receita2 = new Receita(
+                        rs.getInt("idreceita"), 
+                        rs.getString("titulo"),
+                        rs.getString("descricao"),
+                        receUsuario
+                        
+                        
+                    );
+                    System.out.println(receita2);
+                    System.out.println("===================================");
+                }
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao carregar usuários");
+
                 }
                 break;
              case "6":
-                    System.out.print("Digite o  ID da Receita: ");
-                    int idreceita = Integer.parseInt(scanner.nextLine());
+                try{
                     System.out.print("Digite o Titulo: ");
                     String titulo = scanner.nextLine();
                     System.out.print("Digite a Descrição: ");
                     String descricao = scanner.nextLine();
-                    System.out.print("Digite o nome da Imagem: ");
-                    String imagem = scanner.nextLine();
                     System.out.println("Insira o id do usuario autor das opções abaixo: ");
-                    for (Usuario usuario : Usuario.usuarios){
-                        System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
+                    
+                    try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                        "SELECT * FROM usuario;"
+                        );
+                        while(rs.next()){
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+                            System.out.println(usuario2);
+                            System.out.println("===================================");
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
                     }
+
+
                     int autor = Integer.parseInt(scanner.nextLine());
-                    Usuario usu = Usuario.usuarios.stream()
-                        .filter(u -> u.getID() == autor)
-                        .findFirst()
-                        .orElse(null);
-                    Receita d = new Receita(idreceita, titulo, descricao, imagem, usu);
-                    Receita.addReceita(d);
+                    Usuario usu;
+                     try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                        "SELECT * FROM usuario;"
+                        );
+                        while(rs.next()){
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+                           if (usuario2.getID() == autor){
+                            usu = usuario2;
+                            Receita d = new Receita(titulo, descricao, usu);
+                            d.inserir();
+                            Receita.addReceita(d);
+                           }
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
+                    }
+
+
+                }catch(Exception e){
+                     e.printStackTrace();
+                     System.out.print("Erro ao criar receita");
+
+                }
                 break;
              case "7":
-                for (Comentario comentario: Comentario.getComentarios()) {
-                    System.out.println("Informações do Comentário");
-                    System.out.println(comentario);
+                  try{
+                     ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT c.idcomentario, c.comentario AS texto_comentario, c.nota, c.datacomentario, r.idreceita, r.titulo AS receita_titulo, r.descricao AS receita_descricao, r.imagem, u.idusuario AS usuario_id, u.nome AS usuario_nome, u.email AS usuario_email, u.uuid AS usuario_uuid FROM comentario c INNER JOIN receita r ON c.receita_idreceita = r.idreceita INNER JOIN usuario u ON c.usuario_idusuario = u.idusuario;"
+                );
+                while(rs.next()){
+
+
+                    Usuario comeUsuario = new Usuario(
+                        rs.getInt("idusuario"), 
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("data_nascimento"),
+                        rs.getInt("cep"), 
+                        rs.getInt("genero"),
+                        rs.getString("senha"),
+                        rs.getString("salt"),
+                        rs.getString("inscrito"),
+                        rs.getString("uuid")
+
+                    );
+
+                    Receita comeReceita = new Receita(
+                        rs.getInt("idreceita"), 
+                        rs.getString("titulo"),
+                        rs.getString("descricao")
+                
+                    );
+
+                    Comentario comentario2 = new Comentario(
+                        rs.getInt("idcomentario"), 
+                        rs.getString("comentario"),
+                        rs.getInt("nota"),
+                        rs.getString("datacomentario"),
+                        comeUsuario,
+                        comeReceita
+
+                    );
+                    System.out.println(comentario2);
+                    System.out.println("===================================");
+                }
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao carregar usuários");
+
                 }
                 break;
              case "8":
-                    System.out.println("Digite o id do Comentário");
-                    int idcomentario = Integer.parseInt(scanner.nextLine());
+                try{
                     System.out.print("Digite o Comentário: ");
                     String comentarioDesc = scanner.nextLine();
                     System.out.print("Digite a nota do Comentário: ");
                     int nota = Integer.parseInt(scanner.nextLine());
                     System.out.print("Digite a data do Comentário: ");
                     String datacomentario = scanner.nextLine();
+
                     System.out.println("Insira o id do usuario autor das opções abaixo: ");
-                    for (Usuario usuario : Usuario.usuarios){
-                        System.out.println("Usuario ID: "+usuario.idusuario+", Usuario nome: "+usuario.nome);
+
+                    try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                        "SELECT * FROM usuario;"
+                        );
+                        while(rs.next()){
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+                            System.out.println(usuario2);
+                            System.out.println("===================================");
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
                     }
-                    autor = Integer.parseInt(scanner.nextLine());
-                    usu = Usuario.usuarios.stream()
-                        .filter(u -> u.getID() == autor)
-                        .findFirst()
-                        .orElse(null);
+
+                    int autor = Integer.parseInt(scanner.nextLine());
+                    Usuario usu = null;
+                    Receita rece = null;
+
+                   try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                        "SELECT * FROM usuario;"
+                        );
+                        while(rs.next()){
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+                           if (usuario2.getID() == autor){
+                            usu = usuario2;
+                           }
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
+                    }
+
+
+
+
+
                     System.out.println("Insira o id da receita alvo do comentario das opções abaixo: ");
-                    for (Receita receita : Receita.receitas){
-                        System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
-                    }
+
+                    try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT r.idreceita, r.titulo, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.usuario_idusuario = u.idusuario"
+                        
+                        );
+                        while(rs.next()){
+
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+
+                            Receita receita2 = new Receita(
+                                rs.getInt("idreceita"), 
+                                rs.getString("titulo"),
+                                rs.getString("descricao"),
+                                usuario2
+                            );
+
+                            System.out.println(receita2);
+                            System.out.println("===================================");
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
+                    } 
+                   
                     int autorComen = Integer.parseInt(scanner.nextLine());
-                    Receita rece = Receita.receitas.stream()
-                        .filter(u -> u.getID() == autorComen)
-                        .findFirst()
-                        .orElse(null);
-                    Comentario c = new Comentario(idcomentario, comentarioDesc, nota, datacomentario, usu, rece);
-                    Comentario.addComentario(c);
+                    
+                    try{
+                        ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT r.idreceita, r.titulo, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.usuario_idusuario = u.idusuario"
+                        
+                        );
+                        while(rs.next()){
+
+                            Usuario usuario2 = new Usuario(
+                                rs.getInt("idusuario"), 
+                                rs.getString("nome"),
+                                rs.getString("email"),
+                                rs.getString("data_nascimento"),
+                                rs.getInt("cep"), 
+                                rs.getInt("genero"),
+                                rs.getString("senha"),
+                                rs.getString("salt"),
+                                rs.getString("inscrito"),
+                                rs.getString("uuid")
+
+                            );
+
+                            Receita receita2 = new Receita(
+                                rs.getInt("idreceita"), 
+                                rs.getString("titulo"),
+                                rs.getString("descricao"),
+                                usuario2
+                            );
+                            if (receita2.getID() == autorComen){
+                                rece = receita2;
+                            }
+                            
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        System.out.println("Erro ao carregar usuários");
+
+                    } 
+
+                    if (usu != null && rece != null){
+                        Comentario c = new Comentario(comentarioDesc, nota, datacomentario, usu, rece);
+                        c.inserir();
+                        Comentario.addComentario(c);
+                    }
+                   
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.print("Erro ao criar comentario");
+                }
+                    
                 break;
              case "9":
-                for (CategoriaReceita categoriareceitas: CategoriaReceita.getCategoriaReceitas()) {
-                    System.out.println("Informações do CategoriaReceitas");
-                    System.out.println(categoriareceitas);
+                 try{
+                     ResultSet rs = conexao.createStatement().executeQuery(
+                    "SELECT c.idcomentario, c.comentario AS texto_comentario, c.nota, c.datacomentario, r.idreceita, r.titulo AS receita_titulo, r.descricao AS receita_descricao, r.imagem, u.idusuario AS usuario_id, u.nome AS usuario_nome, u.email AS usuario_email, u.uuid AS usuario_uuid FROM comentario c INNER JOIN receita r ON c.receita_idreceita = r.idreceita INNER JOIN usuario u ON c.usuario_idusuario = u.idusuario;"
+                );
+                while(rs.next()){
+
+
+                    Usuario comeUsuario = new Usuario(
+                        rs.getInt("idusuario"), 
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("data_nascimento"),
+                        rs.getInt("cep"), 
+                        rs.getInt("genero"),
+                        rs.getString("senha"),
+                        rs.getString("salt"),
+                        rs.getString("inscrito"),
+                        rs.getString("uuid")
+
+                    );
+
+                    Receita comeReceita = new Receita(
+                        rs.getInt("idreceita"), 
+                        rs.getString("titulo"),
+                        rs.getString("descricao")
+                
+                    );
+
+                    Comentario comentario2 = new Comentario(
+                        rs.getInt("idcomentario"), 
+                        rs.getString("comentario"),
+                        rs.getInt("nota"),
+                        rs.getString("datacomentario"),
+                        comeUsuario,
+                        comeReceita
+
+                    );
+                    System.out.println(comentario2);
+                    System.out.println("===================================");
+                }
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao carregar usuários");
+
                 }
                 break;
              case "10":
-                    System.out.println("Insira o id da categoria receita: ");
-                    int idcategoriareceita = Integer.parseInt(scanner.nextLine());
+                try{
                     System.out.println("Insira o id da receita das opções abaixo: ");
                     for (Receita receita : Receita.receitas){
                         System.out.println("ID: "+receita.getID()+", Titulo da Receita: "+receita.getTitulo());
                     }
                     int receita_idreceita = Integer.parseInt(scanner.nextLine());
-                    rece = Receita.receitas.stream()
+                    Receita rece = Receita.receitas.stream()
                         .filter(u -> u.getID() == receita_idreceita)
                         .findFirst()
                         .orElse(null);
@@ -220,8 +543,13 @@ public class QTGostoso {
                         .filter(u -> u.getID() == categoria_idcategoria)
                         .findFirst()
                         .orElse(null);
-                    CategoriaReceita e = new CategoriaReceita(idcategoriareceita, rece, cate);
+                    CategoriaReceita e = new CategoriaReceita(rece, cate);
                     CategoriaReceita.addCategoriaReceita(e);
+                }catch(Exception e){
+                     e.printStackTrace();
+                    System.out.println("Erro ao criar categoria_receita");
+
+                }
                 break;
             }
         }while(!op.equals( "11"));

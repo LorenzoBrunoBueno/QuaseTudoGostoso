@@ -1,10 +1,14 @@
 import java.util.ArrayList;
+
+
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
+
 
 public class Usuario implements HttpHandler, Comparable<Usuario> {
         int idusuario;
@@ -22,7 +26,7 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         public ArrayList<Comentario> comentarios = new ArrayList<>();
         public ArrayList<Receita> receitas = new ArrayList<>();
 
-    public Usuario(int idusuario, String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ){
+    public Usuario(int idusuario,String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ) throws Exception{
         this.idusuario = idusuario;
         this.nome = nome;
         this.email = email;
@@ -34,7 +38,38 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         this.inscrito = inscrito;
         this.uuid = uuid;
 
+       
+    }
 
+      public Usuario(String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ) throws Exception{
+        this.nome = nome;
+        this.email = email;
+        this.data_nascimento = data_nascimento;
+        this.cep = cep;
+        this.genero = genero;
+        this.senha = senha;
+        this.salt = salt;
+        this.inscrito = inscrito;
+        this.uuid = uuid;
+
+       
+    }
+
+    public void inserir() throws Exception{
+         PreparedStatement stmt = DAO.createConnection().prepareStatement(
+            "INSERT INTO usuario (nome, email, data_nascimento, cep, genero, senha, salt, inscrito, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        );
+        stmt.setString(1, this.getNome());
+        stmt.setString(2, this.getEmail());
+        stmt.setString(3, this.getData_nascimento());
+        stmt.setInt(4, this.getCep());
+        stmt.setInt(5, this.getGenero());
+        stmt.setString(6, this.getSenha());
+        stmt.setString(7, this.getSalt());
+        stmt.setString(8, this.getInscrito());
+        stmt.setString(9, this.getUuid());
+        stmt.execute();
+        DAO.closeConnection();
     }
 
     public static void addUsuario(Usuario usuario){
@@ -154,26 +189,40 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         this.uuid = uuid;
     }
 
-     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
-        if (method.equalsIgnoreCase("GET")) {
-            handleGet(exchange);
-        } else if (method.equalsIgnoreCase("POST")) {
-            handlePost(exchange);
-        } else {
-            String response = "Método não suportado, Utilize apenas GET e POST!";
+    @Override
+    public void handle(HttpExchange exchange) throws IOException{
+
+        try{
+            String method = exchange.getRequestMethod();
+            if (method.equalsIgnoreCase("GET")) {
+                handleGet(exchange);
+            } else if (method.equalsIgnoreCase("POST")) {
+                handlePost(exchange);
+            } else {
+                String response = "Método não suportado, Utilize apenas GET e POST!";
+                byte[] bytes = response.getBytes("UTF-8");
+                exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
+                exchange.sendResponseHeaders(405, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            String response = "Erro interno no servidor.";
             byte[] bytes = response.getBytes("UTF-8");
             exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
-            exchange.sendResponseHeaders(405, bytes.length);
+            exchange.sendResponseHeaders(500, bytes.length);
+
             OutputStream os = exchange.getResponseBody();
             os.write(bytes);
             os.close();
         }
+
     }
 
 
-    public void handleGet(HttpExchange exchange) throws IOException{
+    public void handleGet(HttpExchange exchange) throws IOException, Exception{
          StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < usuarios.size(); i++) {
             Usuario x = usuarios.get(i);
@@ -191,11 +240,10 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         }
     }
 
-     private void handlePost(HttpExchange exchange) throws IOException {
+     private void handlePost(HttpExchange exchange) throws IOException, Exception {
         InputStream is = exchange.getRequestBody();
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
-        String idusuario = body.replaceAll(".*\"Usuario ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String nome = body.replaceAll(".*\"Nome\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String email = body.replaceAll(".*\"Email\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String data_nasci = body.replaceAll(".*\"Data Nascimento\"\\s*:\\s*\"([^\"]+)\".*", "$1");
@@ -205,12 +253,11 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         String salt = body.replaceAll(".*\"Salt\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String inscrito = body.replaceAll(".*\"Inscrito\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String uuid = body.replaceAll(".*\"UUID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        int idusu = Integer.parseInt(idusuario);
         int intcep = Integer.parseInt(cep);
         int intgenero = Integer.parseInt(genero);
 
           
-        new Usuario(idusu, nome, email, data_nasci, intcep, intgenero, Senha, salt, inscrito, uuid);
+        new Usuario(idusuario, nome, email, data_nasci, intcep, intgenero, Senha, salt, inscrito, uuid);
 
         String response = "{\"message\": \"Usuario adicionada com sucesso\"}";
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);

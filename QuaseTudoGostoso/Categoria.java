@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
 
 public class Categoria implements HttpHandler, Comparable<Categoria>{
     private int idcategoria;
@@ -15,10 +16,30 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
     public ArrayList<CategoriaReceita> categoriasreceitas = new ArrayList<>();
    
 
-    public Categoria(int idcategoria, String categoriaDesc, int ativo){
+    public Categoria(int idcategoria, String categoriaDesc, int ativo) throws Exception{
         this.idcategoria = idcategoria;
         this.categoriaDesc = categoriaDesc;
         this.ativo = ativo;
+
+      
+    }
+
+    public Categoria(String categoriaDesc, int ativo) throws Exception{
+        this.categoriaDesc = categoriaDesc;
+        this.ativo = ativo;
+
+      
+    }
+
+    public void inserir() throws Exception{
+          PreparedStatement stmt = DAO.createConnection().prepareStatement (
+            "INSERT INTO categoria (categoria, ativo) VALUES (?, ?);"
+        );
+        stmt.setString(1, this.getCategoriaDesc());
+        stmt.setInt(2, this.getAtivo());
+
+        stmt.execute();
+        DAO.closeConnection();
     }
 
     public static void addCategoria(Categoria categoria){
@@ -74,7 +95,8 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+        try{
+             String method = exchange.getRequestMethod();
         if (method.equalsIgnoreCase("GET")) {
             handleGet(exchange);
         } else if (method.equalsIgnoreCase("POST")) {
@@ -88,6 +110,18 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
             os.write(bytes);
             os.close();
         }
+        }catch(Exception e){
+            e.printStackTrace();
+            String response = "Erro interno no servidor.";
+            byte[] bytes = response.getBytes("UTF-8");
+            exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
+            exchange.sendResponseHeaders(500, bytes.length);
+
+            OutputStream os = exchange.getResponseBody();
+            os.write(bytes);
+            os.close();
+        }
+       
     }
 
     private void handleGet(HttpExchange exchange) throws IOException {
@@ -108,17 +142,15 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
         }
     }
 
-    private void handlePost(HttpExchange exchange) throws IOException {
+    private void handlePost(HttpExchange exchange) throws IOException, Exception {
         InputStream is = exchange.getRequestBody();
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
-        String idcategoria = body.replaceAll(".*\"categoria ID\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String categoriaDescri = body.replaceAll(".*\"Descricao\"\\s*:\\s*\"([^\"]+)\".*", "$1");
         String Ativo = body.replaceAll(".*\"ativo\"\\s*:\\s*\"([^\"]+)\".*", "$1");
-        int catego = Integer.parseInt(idcategoria);
         int ativo = Integer.parseInt(Ativo);
         
-        new Categoria(catego, categoriaDescri, ativo);
+        new Categoria(categoriaDescri, ativo);
 
         String response = "{\"message\": \"Categoria adicionada com sucesso\"}";
         byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
