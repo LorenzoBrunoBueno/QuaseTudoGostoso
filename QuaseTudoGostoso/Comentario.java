@@ -49,7 +49,7 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
 
     public void inserir()throws Exception{
          PreparedStatement stmt = DAO.createConnection().prepareStatement (
-            "INSERT INTO comentario (comentario, nota, datacomentario, cadastro_idusuario, receita_idreceita) VALUES (?, ?, ?, ?);"
+            "INSERT INTO comentario (comentario, nota, datacomentario, usuario_idusuario, receita_idreceita) VALUES (?, ?, ?, ?, ?);"
         );
         stmt.setString(1, this.getComentarioDesc());
         stmt.setInt(2, this.getNota());
@@ -123,9 +123,9 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         return
          "" +
         "Id:" + this.getID() + "\n" +
-        "Nome:" + this.getComentarioDesc() + "\n" +
-        "Email:" + this.getNota() + "\n" +
-        "Data Nascimento:" + this.getDatacomentario() + "\n" +
+        "Comentário:" + this.getComentarioDesc() + "\n" +
+        "Nota:" + this.getNota() + "\n" +
+        "Data do Comentário:" + this.getDatacomentario() + "\n" +
         "Usuario:" + this.getUsuario() + "\n" +
         "Receita:" + this.getReceita();
     }

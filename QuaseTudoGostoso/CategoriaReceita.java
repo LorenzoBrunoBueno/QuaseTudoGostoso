@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 
 
 public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceita>{
-    int idcategoriareceita;
     Receita receita;
     Categoria categoria;
 
@@ -20,20 +19,13 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         this.categoria = categoria;
 
         
-
-        receita.categoriasreceitas.add(this);
-        categoria.categoriasreceitas.add(this);
-    }
-
-    public CategoriaReceita(int idcategoriareceita, Receita receita, Categoria categoria) throws Exception{
-        this.idcategoriareceita = idcategoriareceita;
-        this.receita = receita;
-        this.categoria = categoria;
-
+        if(receita != null) {
+            receita.categoriasreceitas.add(this);
+        }
+        if(categoria != null){
+            categoria.categoriasreceitas.add(this);
+        }
         
-
-        receita.categoriasreceitas.add(this);
-        categoria.categoriasreceitas.add(this);
     }
 
     public void inserir() throws Exception{
@@ -57,20 +49,12 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         
     }
 
-    public int getID(){
-        return idcategoriareceita;
-    }
-
     public Receita getReceita(){
         return receita;
     }
 
     public Categoria getCategoria(){
         return categoria;
-    }
-
-    public void setID(int idcategoriareceita){
-        this.idcategoriareceita = idcategoriareceita;
     }
 
     public void setCategoria(Categoria categoria){
@@ -90,7 +74,6 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
     public String toString() {
         return
          "" +
-        "Id:" + this.getID() + "\n" +
         "Receita:" + this.getReceita() + "\n" +
         "Categoria:" + this.getCategoria();
     }
@@ -128,8 +111,8 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < categoriasreceitas.size(); i++) {
             CategoriaReceita c = categoriasreceitas.get(i);
-            json.append(String.format("{\"id\": \"%s\",\"Receita ID\": \"%s\",\"Categoria ID\": \"%s\"}",
-                    c.getID(), c.getReceita(), c.getCategoria()));
+            json.append(String.format("{\"Receita ID\": \"%s\",\"Categoria ID\": \"%s\"}",
+                c.getReceita(), c.getCategoria()));
             if (i < categoriasreceitas.size() - 1) json.append(",");
         }
         json.append("]");

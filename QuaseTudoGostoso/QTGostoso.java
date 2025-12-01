@@ -267,7 +267,7 @@ public class QTGostoso {
              case "7":
                   try{
                      ResultSet rs = conexao.createStatement().executeQuery(
-                    "SELECT c.idcomentario, c.comentario AS texto_comentario, c.nota, c.datacomentario, r.idreceita, r.titulo AS receita_titulo, r.descricao AS receita_descricao, r.imagem, u.idusuario AS usuario_id, u.nome AS usuario_nome, u.email AS usuario_email, u.uuid AS usuario_uuid FROM comentario c INNER JOIN receita r ON c.receita_idreceita = r.idreceita INNER JOIN usuario u ON c.usuario_idusuario = u.idusuario;"
+                    "SELECT c.idcomentario, c.comentario, c.nota, c.datacomentario, r.idreceita, r.titulo, r.descricao, r.imagem, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM comentario c INNER JOIN receita r ON c.receita_idreceita = r.idreceita INNER JOIN usuario u ON c.usuario_idusuario = u.idusuario;"
                 );
                 while(rs.next()){
 
@@ -317,7 +317,7 @@ public class QTGostoso {
                     String comentarioDesc = scanner.nextLine();
                     System.out.print("Digite a nota do Comentário: ");
                     int nota = Integer.parseInt(scanner.nextLine());
-                    System.out.print("Digite a data do Comentário: ");
+                    System.out.print("Digite a data do Comentário (2025-11-24 15:30:00): ");
                     String datacomentario = scanner.nextLine();
 
                     System.out.println("Insira o id do usuario autor das opções abaixo: ");
@@ -389,7 +389,7 @@ public class QTGostoso {
 
                     try{
                         ResultSet rs = conexao.createStatement().executeQuery(
-                    "SELECT r.idreceita, r.titulo, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.usuario_idusuario = u.idusuario"
+                    "SELECT r.idreceita, r.titulo, r.descricao, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.cadastro_idusuario = u.idusuario"
                         
                         );
                         while(rs.next()){
@@ -428,7 +428,7 @@ public class QTGostoso {
                     
                     try{
                         ResultSet rs = conexao.createStatement().executeQuery(
-                    "SELECT r.idreceita, r.titulo, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.usuario_idusuario = u.idusuario"
+                    "SELECT r.idreceita, r.titulo, r.descricao, u.idusuario, u.nome, u.email, u.data_nascimento, u.cep, u.genero, u.senha, u.salt, u.inscrito, u.uuid FROM receita r INNER JOIN usuario u ON r.cadastro_idusuario = u.idusuario"
                         
                         );
                         while(rs.next()){
@@ -479,42 +479,32 @@ public class QTGostoso {
              case "9":
                  try{
                      ResultSet rs = conexao.createStatement().executeQuery(
-                    "SELECT c.idcomentario, c.comentario AS texto_comentario, c.nota, c.datacomentario, r.idreceita, r.titulo AS receita_titulo, r.descricao AS receita_descricao, r.imagem, u.idusuario AS usuario_id, u.nome AS usuario_nome, u.email AS usuario_email, u.uuid AS usuario_uuid FROM comentario c INNER JOIN receita r ON c.receita_idreceita = r.idreceita INNER JOIN usuario u ON c.usuario_idusuario = u.idusuario;"
+                    "SELECT cr.receita_idreceita, cr.categoria_idcategoria, r.idreceita, r.titulo, r.descricao, c.idcategoria, c.categoria, c.ativo FROM categoria_receita cr INNER JOIN receita r ON cr.receita_idreceita = r.idreceita INNER JOIN categoria c ON cr.categoria_idcategoria = c.idcategoria;"
                 );
                 while(rs.next()){
 
 
-                    Usuario comeUsuario = new Usuario(
-                        rs.getInt("idusuario"), 
-                        rs.getString("nome"),
-                        rs.getString("email"),
-                        rs.getString("data_nascimento"),
-                        rs.getInt("cep"), 
-                        rs.getInt("genero"),
-                        rs.getString("senha"),
-                        rs.getString("salt"),
-                        rs.getString("inscrito"),
-                        rs.getString("uuid")
+                   Categoria categoria2 = new Categoria(
+                        rs.getInt("idcategoria"),
+                        rs.getString("categoria"),
+                        rs.getInt("ativo")
 
-                    );
+                   );
 
-                    Receita comeReceita = new Receita(
+                    Receita receita2 = new Receita(
                         rs.getInt("idreceita"), 
                         rs.getString("titulo"),
                         rs.getString("descricao")
                 
                     );
 
-                    Comentario comentario2 = new Comentario(
-                        rs.getInt("idcomentario"), 
-                        rs.getString("comentario"),
-                        rs.getInt("nota"),
-                        rs.getString("datacomentario"),
-                        comeUsuario,
-                        comeReceita
+                    CategoriaReceita categoriaReceita = new CategoriaReceita(
+                        receita2,
+                        categoria2
 
                     );
-                    System.out.println(comentario2);
+
+                    System.out.println(categoriaReceita);
                     System.out.println("===================================");
                 }
                 }catch(Exception e){

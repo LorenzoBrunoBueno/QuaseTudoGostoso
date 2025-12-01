@@ -22,7 +22,10 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         this.descricao = descricao;
         this.usuario = usuario;
 
-        usuario.receitas.add(this);
+        //usuario.receitas.add(this);
+        if (usuario != null) {
+            usuario.receitas.add(this);
+        }
     }
 
     public Receita(int idreceita, String titulo, String descricao, Usuario usuario) throws Exception{
@@ -31,7 +34,10 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         this.descricao = descricao;
         this.usuario = usuario;
 
-        usuario.receitas.add(this);
+        //usuario.receitas.add(this);
+        if (usuario != null) {
+            usuario.receitas.add(this);
+        }
     }
 
      public Receita(int idreceita, String titulo, String descricao) throws Exception{
@@ -39,7 +45,10 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         this.titulo = titulo;
         this.descricao = descricao;
 
-        usuario.receitas.add(this);
+        if (usuario != null) {
+            usuario.receitas.add(this);
+        }
+        //usuario.receitas.add(this);
     }
 
     public void inserir() throws Exception{
@@ -49,7 +58,7 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         stmt.setString(1, this.getTitulo());
         stmt.setString(2, this.getDescricao());
         stmt.setInt(3, this.usuario.getID());
-        stmt.setInt(4, 1);
+        stmt.setInt(4, 5);
         stmt.setInt(5, 1);
         stmt.setInt(6, 1);
 
