@@ -31,6 +31,23 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         usuario.comentarios.add(this);
     }
 
+    public Comentario(int idcomentario) throws Exception{
+        this.idcomentario = idcomentario;
+    }
+
+    public Comentario(int idcomentario, String comentarioDesc, int nota) throws Exception{
+        this.idcomentario = idcomentario;
+        this.comentarioDesc = comentarioDesc;
+        this.nota = nota;
+    }
+
+    public Comentario(int idcomentario, String comentarioDesc, int nota, String datacomentario) throws Exception{
+        this.idcomentario = idcomentario;
+        this.comentarioDesc = comentarioDesc;
+        this.nota = nota;
+        this.datacomentario = datacomentario;
+    }
+
     public Comentario(int idcomentario, String comentarioDesc, int nota, String datacomentario, Usuario usuario, Receita receita) throws Exception{
         this.idcomentario = idcomentario;
         this.comentarioDesc = comentarioDesc;
@@ -58,6 +75,27 @@ public class Comentario implements HttpHandler, Comparable<Comentario>{
         stmt.setInt(5, this.receita.getID());
 
         stmt.execute();
+        DAO.closeConnection();
+    }
+
+    public void alterar() throws Exception {
+        PreparedStatement stmt = DAO.createConnection().prepareStatement(
+            "UPDATE comentario SET comentario = ?, nota = ? WHERE idcomentario = ?"
+        );
+
+        stmt.setString(1, this.getComentarioDesc());
+        stmt.setInt(2, this.getNota());
+        stmt.setInt(3, this.getID());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
+    public void deletar() throws Exception{
+        PreparedStatement stmt = DAO.createConnection().prepareStatement("DELETE FROM comentario where idcomentario = ?");
+
+        stmt.setInt(1, this.getID());
+        stmt.executeUpdate();
         DAO.closeConnection();
     }
 

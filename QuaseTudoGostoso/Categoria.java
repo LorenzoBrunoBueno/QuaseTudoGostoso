@@ -24,6 +24,10 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
       
     }
 
+    public Categoria(int idcategoria) throws Exception{
+        this.idcategoria = idcategoria;
+    }
+
     public Categoria(String categoriaDesc, int ativo) throws Exception{
         this.categoriaDesc = categoriaDesc;
         this.ativo = ativo;
@@ -38,6 +42,27 @@ public class Categoria implements HttpHandler, Comparable<Categoria>{
         stmt.setString(1, this.getCategoriaDesc());
         stmt.setInt(2, this.getAtivo());
 
+        stmt.execute();
+        DAO.closeConnection();
+    }
+
+    public void alterar() throws Exception {
+        PreparedStatement stmt = DAO.createConnection().prepareStatement(
+            "UPDATE categoria SET categoria = ?, ativo = ? WHERE idcategoria = ?"
+        );
+
+        stmt.setString(1, this.getCategoriaDesc());
+        stmt.setInt(2, this.getAtivo());
+        stmt.setInt(3, this.getID());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
+    public void deletar() throws Exception{
+        PreparedStatement stmt = DAO.createConnection().prepareStatement("DELETE FROM categoria where idcategoria = ?");
+
+        stmt.setInt(1, this.getID());
         stmt.execute();
         DAO.closeConnection();
     }

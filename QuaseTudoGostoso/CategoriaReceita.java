@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 
 
 public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceita>{
+    int idreceita;
+    int idcategoria;
     Receita receita;
     Categoria categoria;
 
@@ -28,6 +30,11 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         
     }
 
+    public CategoriaReceita(int idreceita, int idcategoria) throws Exception{
+        this.idreceita = idreceita;
+        this.idcategoria = idcategoria;
+    }
+
     public void inserir() throws Exception{
         PreparedStatement stmt = DAO.createConnection().prepareStatement (
             "INSERT INTO categoria_receita (categoria_idcategoria, receita_idreceita) VALUES (?, ?);"
@@ -39,6 +46,36 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         DAO.closeConnection();
     }
 
+    public void alterar(int idreceita, int idcategoria) throws Exception {
+
+        PreparedStatement stmtDel = DAO.createConnection().prepareStatement("DELETE FROM categoria_receita where receita_idreceita = ? and categoria_idcategoria = ?");
+
+        stmtDel.setInt(1, idreceita);
+        stmtDel.setInt(2, idcategoria);
+
+        stmtDel.executeUpdate();
+
+
+        PreparedStatement stmt = DAO.createConnection().prepareStatement (
+            "INSERT INTO categoria_receita (categoria_idcategoria, receita_idreceita) VALUES (?, ?);"
+        );
+        stmt.setInt(1, this.categoria.getID());
+        stmt.setInt(2, this.receita.getID());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
+    public void deletar() throws Exception{
+        PreparedStatement stmt = DAO.createConnection().prepareStatement("DELETE FROM categoria_receita where receita_idreceita = ? and categoria_idcategoria = ?");
+
+        stmt.setInt(1, this.getidReceita());
+        stmt.setInt(2, this.getidCategoria());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
     @Override
     public int compareTo(CategoriaReceita other) {
         // Example: Sort by 'nome' in ascending order
@@ -47,6 +84,15 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
 
     public CategoriaReceita(){
         
+    }
+
+    public int getidReceita(){
+        return idreceita;
+    }
+
+
+    public int getidCategoria(){
+        return idcategoria;
     }
 
     public Receita getReceita(){

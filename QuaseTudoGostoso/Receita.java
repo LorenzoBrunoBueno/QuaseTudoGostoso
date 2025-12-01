@@ -28,6 +28,10 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         }
     }
 
+    public Receita(int idreceita) throws Exception{
+        this.idreceita = idreceita;
+    }
+
     public Receita(int idreceita, String titulo, String descricao, Usuario usuario) throws Exception{
         this.idreceita = idreceita;
         this.titulo = titulo;
@@ -64,6 +68,27 @@ public class Receita implements HttpHandler, Comparable<Receita>{
 
 
         stmt.execute();
+        DAO.closeConnection();
+    }
+
+    public void alterar() throws Exception {
+        PreparedStatement stmt = DAO.createConnection().prepareStatement(
+            "UPDATE receita SET titulo = ?, descricao = ? WHERE idreceita = ?"
+        );
+
+        stmt.setString(1, this.getTitulo());
+        stmt.setString(2, this.getDescricao());
+        stmt.setInt(3, this.getID());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
+    public void deletar() throws Exception{
+        PreparedStatement stmt = DAO.createConnection().prepareStatement("DELETE FROM receita where idreceita = ?");
+
+        stmt.setInt(1, this.getID());
+        stmt.executeUpdate();
         DAO.closeConnection();
     }
 

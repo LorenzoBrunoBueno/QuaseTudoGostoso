@@ -41,7 +41,22 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
        
     }
 
-      public Usuario(String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ) throws Exception{
+    public Usuario(int idusuario){
+        this.idusuario = idusuario;
+    }
+
+    public Usuario(int idusuario, String nome, String email, String data_nascimento, int cep, int genero, String senha){
+        this.idusuario = idusuario;
+        this.nome = nome;
+        this.email = email;
+        this.data_nascimento = data_nascimento;
+        this.cep = cep;
+        this.genero = genero;
+        this.senha = senha;
+
+    }
+
+    public Usuario(String nome, String email, String data_nascimento, int cep, int genero, String senha, String salt, String inscrito, String uuid ) throws Exception{
         this.nome = nome;
         this.email = email;
         this.data_nascimento = data_nascimento;
@@ -54,6 +69,8 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
 
        
     }
+
+    
 
     public void inserir() throws Exception{
          PreparedStatement stmt = DAO.createConnection().prepareStatement(
@@ -69,6 +86,33 @@ public class Usuario implements HttpHandler, Comparable<Usuario> {
         stmt.setString(8, this.getInscrito());
         stmt.setString(9, this.getUuid());
         stmt.execute();
+        DAO.closeConnection();
+    }
+
+    
+    public void alterar() throws Exception {
+        PreparedStatement stmt = DAO.createConnection().prepareStatement(
+            "UPDATE usuario SET nome = ?, email = ?, data_nascimento = ?, cep = ?, genero = ?, senha = ? WHERE idusuario = ?"
+        );
+
+        stmt.setString(1, this.getNome());
+        stmt.setString(2, this.getEmail());
+        stmt.setString(3, this.getData_nascimento());
+        stmt.setInt(4, this.getCep());
+        stmt.setInt(5, this.getGenero());
+        stmt.setString(6, this.getSenha());
+
+        stmt.setInt(7, this.getID());
+
+        stmt.executeUpdate();
+        DAO.closeConnection();
+    }
+
+    public void deletar() throws Exception{
+        PreparedStatement stmt = DAO.createConnection().prepareStatement("DELETE FROM usuario where idusuario = ?");
+
+        stmt.setInt(1, this.getID());
+        stmt.executeUpdate();
         DAO.closeConnection();
     }
 
