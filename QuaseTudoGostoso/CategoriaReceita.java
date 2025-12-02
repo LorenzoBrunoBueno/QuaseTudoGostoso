@@ -39,8 +39,8 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         PreparedStatement stmt = DAO.createConnection().prepareStatement (
             "INSERT INTO categoria_receita (categoria_idcategoria, receita_idreceita) VALUES (?, ?);"
         );
-        stmt.setInt(1, this.categoria.getID());
-        stmt.setInt(2, this.receita.getID());
+        stmt.setInt(1, this.getidCategoria());
+        stmt.setInt(2, this.getidReceita());
 
         stmt.execute();
         DAO.closeConnection();
@@ -59,8 +59,8 @@ public class CategoriaReceita implements HttpHandler, Comparable<CategoriaReceit
         PreparedStatement stmt = DAO.createConnection().prepareStatement (
             "INSERT INTO categoria_receita (categoria_idcategoria, receita_idreceita) VALUES (?, ?);"
         );
-        stmt.setInt(1, this.categoria.getID());
-        stmt.setInt(2, this.receita.getID());
+        stmt.setInt(1, this.getidCategoria());
+        stmt.setInt(2, this.getidReceita());
 
         stmt.executeUpdate();
         DAO.closeConnection();

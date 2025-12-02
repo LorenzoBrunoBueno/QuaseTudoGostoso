@@ -62,9 +62,9 @@ public class Receita implements HttpHandler, Comparable<Receita>{
         stmt.setString(1, this.getTitulo());
         stmt.setString(2, this.getDescricao());
         stmt.setInt(3, this.usuario.getID());
-        stmt.setInt(4, 5);
-        stmt.setInt(5, 1);
-        stmt.setInt(6, 1);
+        stmt.setInt(4, 5); // Pre-cadastrado no banco
+        stmt.setInt(5, 1); // Pre-cadastrado no banco
+        stmt.setInt(6, 1); // Pre-cadastrado no banco
 
 
         stmt.execute();
